@@ -1,0 +1,59 @@
+---
+- name: Install Mysql8 from community | mysql8
+  dnf:
+    name: '@mysql'
+    state: present
+
+- name: Create /var/lib/mysql directory | mysql8
+  file:
+    path: /var/lib/mysql
+    state: directory
+    owner: mysql
+    group: mysql
+
+- name: Enable Mysql8 service | mysql8
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+# - name: Get temporary password | mysql8
+#   command: bash -c "grep 'temporary password' /var/log/mysql/mysqld.log | awk '{print $NF}'"
+#   register: mysql_temp_password
+#   changed_when: False
+
+- name: Set Mysql root password
+  shell: mysql -u root -e 'ALTER USER root@localhost IDENTIFIED WITH mysql_native_password BY "{{ mysql8_root_password }}";' --connect-expired-password
+  ignore_errors: yes
+
+- name: Copy my.cnf | mysql8
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: '0600'
+  with_items:
+    - 'etc/my.cnf'
+  notify:
+    - restart mysql8
+
+- name: Make sure pymysql is present
+  pip:
+    name: pymysql
+    state: present
+
+- name: Create a new database with name {{ mysql_database_name }}
+  mysql_db:
+    name: "{{ mysql_database_name }}"
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+
+- name: Create a new username {{ mysql_username }} and grant access to {{ mysql_database_name }}
+  mysql_user:
+    name: "{{ mysql_username }}"
+    password: "{{ mysql_username_password }}"
+    priv: "{{ mysql_database_name }}.*:ALL"
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+    host: "%"

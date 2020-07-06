@@ -1,0 +1,24 @@
+---
+- name: Install Certbot.
+  yum:
+    name: certbot
+    state: present
+
+- name: Set Certbot script variable.
+  set_fact:
+    certbot_script: "certbot"
+
+- import_tasks: install-from-source.yml
+
+- include_tasks: create-cert-standalone.yml
+  with_items: "{{ certbot_certs }}"
+  when:
+    - certbot_create_if_missing
+    - certbot_create_method == 'standalone'
+  loop_control:
+    loop_var: cert_item
+
+- include_tasks: nginx.yml
+
+- import_tasks: renew-cron.yml
+  when: certbot_auto_renew

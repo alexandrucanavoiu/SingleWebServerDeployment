@@ -1,0 +1,104 @@
+---
+- name: Nginx prepare | ensure a list of packages installed
+  yum:
+    name: "{{ nginx_packages }}"
+    state: present
+
+- name: Add group nginx
+  group:
+    name: nginx
+    state: present
+
+- name: Add user nginx
+  user:
+    name: nginx
+    shell: "/sbin/nologin"
+    home: "/var/cache/nginx"
+    group: nginx
+    system: yes
+    state: present
+
+- name: Create /var/lib/nginx/tmp/client_body
+  file:
+    path: "/var/lib/nginx/tmp/client_body"
+    state: directory
+    owner: nginx
+    group: root
+    mode: '0755'
+
+- name: Create /var/www/nginx/ folder
+  file:
+    path: "/var/www/nginx"
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: '0755'
+
+- name: Create Nginx directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+      - "/etc/nginx/conf.d/"
+      - "/etc/nginx/sites-enabled/"
+
+- name: Delete /usr/share/nginx/html folder
+  file:
+    path: "/usr/share/nginx/html"
+    state: absent
+
+- name: Analyzing the directories to delete...
+  find:
+    paths: "{{ download_path }}"
+    patterns: "nginx-*"
+    use_regex: true
+    file_type: directory
+  register: folders_to_delete
+
+- name: Deleting the directories...
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ folders_to_delete.files }}"
+
+- name: Analyzing the files to delete...
+  find:
+    paths: "{{ download_path }}"
+    patterns: "nginx-*"
+    use_regex: true
+    file_type: file
+  register: files_to_delete
+
+- name: Deleting the directories...
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+
+- name: Generate .htpasswd password for user {{ phpmyadmin_auth_user }}
+  shell: openssl passwd -apr1 -in <(printf "{{ phpmyadmin_auth_password }}")
+  args:
+    executable: /bin/bash
+    chdir: "{{ download_path }}"
+  register: command_output_passwd_auth_phpmyadmin
+
+- set_fact:
+    passwd_auth_phpmyadmin: "{{ command_output_passwd_auth_phpmyadmin.stdout }}"
+
+- name: Insert phpmyadmin user / pass in .htpasswd
+  shell: "echo '{{ phpmyadmin_auth_user }}:{{ passwd_auth_phpmyadmin }}' > /var/www/.htpasswd"
+
+- name: Download nginx-{{ nginx_version }}
+  get_url:
+    url: "https://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
+    dest: "{{ download_path }}"
+
+- name: Unpacking nginx-{{ nginx_version }}
+  unarchive:
+    copy: no
+    dest: "{{ download_path }}"
+    src: "{{ download_path }}/nginx-{{ nginx_version }}.tar.gz"
+  register: nginx_version_source_unpack

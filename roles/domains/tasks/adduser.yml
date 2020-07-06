@@ -1,0 +1,21 @@
+---
+- name: Add group {{ domain_username }} with GUID {{ domain_username_id }}
+  group:
+    name: "{{ domain_username }}"
+    gid: "{{ domain_username_id }}"
+    state: present
+
+- name: Add user {{ domain_username }} with GUID {{ domain_username_id }}
+  user:
+    name: "{{ domain_username }}"
+    uid: "{{ domain_username_id }}"
+    shell: "/bin/bash"
+    home: "/home/{{ domain_username }}"
+    create_home: yes
+    group: "{{ domain_username_id }}"
+    state: present
+
+- name: Change folder permissions {{ domain_username }}  to 755
+  file:
+    path: "/home/{{ domain_username }}"
+    mode: '0755'

@@ -1,0 +1,20 @@
+---
+- name: Install rsyslog
+  yum:
+    name: rsyslog
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: Copy rsyslog files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+  with_items:
+    - 'etc/rsyslog.d/10-shorewall.conf'
+
+- name: Enable rsyslog
+  systemd:
+    name: rsyslog
+    enabled: yes
+    state: restarted

@@ -1,0 +1,19 @@
+---
+- hosts: server
+  user: root
+  become: false
+  gather_facts: yes
+  vars_files:
+    - vars/setup-server-vars.yml
+  roles:
+          - { role: server-prepare, tags: server-prepare }
+          - { role: rsyslog, tags: rsyslog }
+          - { role: logrotate, tags: logrotate }
+          - { role: shorewall, tags: shorewall }
+          - { role: nginx, tags: nginx }
+          - { role: php, tags: php }
+          - { role: composer-tool, tags: composer-tool }
+          - { role: domains, tags: domains }
+          - { role: certbot, tags: certbot, when: domain_ssl == 2 }
+          - { role: mysql8, tags: mysql8 }
+          - { role: phpmyadmin, tags: phpmyadmin }

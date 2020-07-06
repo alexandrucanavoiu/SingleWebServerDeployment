@@ -1,0 +1,22 @@
+---
+- name: Install PHP 74
+  yum:
+    name: "{{ php74_version }}"
+    state: present
+  when: install_php74 == 1
+  retries: 3
+
+- name: PHP-FPM 7.4 Copy php.ini file
+  template:
+    src: etc/opt/remi/php74/php74.ini.j2
+    dest: "/etc/opt/remi/php74/php.ini"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Recursively change ownership of a directory
+  file:
+    path: "/var/opt/remi/php74/lib/php/"
+    owner: root
+    group: "nginx"
+    recurse: yes

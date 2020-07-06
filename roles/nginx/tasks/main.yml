@@ -1,0 +1,26 @@
+---
+- name: Get running processes nginx list
+  ignore_errors: yes
+  shell: "ps -few | grep nginx | awk '{print $2}'"
+  register: running_processes
+
+- name: Kill running processes
+  ignore_errors: yes
+  shell: "kill {{ item }}"
+  with_items: "{{ running_processes.stdout_lines }}"
+
+- wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  with_items: "{{ running_processes.stdout_lines }}"
+  ignore_errors: yes
+  register: nginx_processes
+
+- name: Force kill stuck processes
+  ignore_errors: yes
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ nginx_processes.results | select('failed') | map(attribute='item') | list }}"
+
+- import_tasks: prepare.yml
+
+- import_tasks: install.yml

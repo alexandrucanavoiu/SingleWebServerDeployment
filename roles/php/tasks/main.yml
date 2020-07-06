@@ -1,0 +1,41 @@
+---
+- name: Disable the default PHP module
+  shell: dnf module reset php -y
+
+- import_tasks: php-71.yml
+  when: install_php71 == 1
+
+- import_tasks: php-73.yml
+  when: install_php73 == 1
+
+- import_tasks: php-74.yml
+  when: install_php74 == 1
+
+- name: Remove file www.conf
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+      - "/etc/opt/remi/php71/php-fpm.d/www.conf"
+      - "/etc/opt/remi/php73/php-fpm.d/www.conf"
+      - "/etc/opt/remi/php74/php-fpm.d/www.conf"
+
+- name: PHP-FPM Copy www.conf file
+  template:
+    src: 00-default.conf.j2
+    dest: "/etc/opt/remi/{{ default_php_version }}/php-fpm.d/00-default.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add as default {{ default_php_version }}
+  shell: "ln -s /opt/remi/{{ default_php_version }}/root/usr/bin/php /usr/bin/php"
+  args:
+    chdir: "{{ download_path }}/"
+  ignore_errors: yes
+
+- name: Enable PHP {{ default_php_version }} service
+  systemd:
+    name: "{{ default_php_version }}-php-fpm"
+    state: restarted
+    enabled: yes

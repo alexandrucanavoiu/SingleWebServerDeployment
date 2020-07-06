@@ -1,0 +1,8 @@
+---
+- import_tasks: precheck.yml
+
+- import_tasks: adduser.yml
+
+- import_tasks: ssl-self.yml
+
+- import_tasks: php-nginx.yml

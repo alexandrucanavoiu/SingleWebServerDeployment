@@ -1,0 +1,23 @@
+---
+- set_fact:
+    line_certbot_crt: "ssl_certificate         /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem;"
+    line_certbot_key: "ssl_certificate_key     /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;"
+    line_certbot_chain: "ssl_trusted_certificate /etc/letsencrypt/live/{{ domain_name }}/chain.pem;"
+
+- name: Replace SSL CRT in nginx
+  replace:
+    path: "/etc/nginx/sites-enabled/01-{{ domain_name }}.conf"
+    regexp: 'ssl_certificate .*'
+    replace: '{{ line_certbot_crt }}'
+
+- name: Replace SSL KEY in nginx
+  replace:
+    path: "/etc/nginx/sites-enabled/01-{{ domain_name }}.conf"
+    regexp: 'ssl_certificate_key .*'
+    replace: '{{ line_certbot_key }}'
+
+- name: Replace SSL CHAIN in nginx
+  replace:
+    path: "/etc/nginx/sites-enabled/01-{{ domain_name }}.conf"
+    regexp: 'ssl_trusted_certificate .*'
+    replace: '{{ line_certbot_chain }}'

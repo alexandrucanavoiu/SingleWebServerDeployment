@@ -1,0 +1,9 @@
+---
+buildtools_packages:
+  - "@Development Tools"
+  - wget
+  - curl
+  - openssl
+  - openssl-devel.x86_64
+  - vim
+  - net-tools

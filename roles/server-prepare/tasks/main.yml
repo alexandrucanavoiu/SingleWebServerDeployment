@@ -1,0 +1,77 @@
+---
+- name: Get OS Name
+  shell: awk -F= '$1=="PRETTY_NAME" { print $2 ;}' /etc/os-release
+  register: os_release
+
+- name: Validate OS
+  fail:
+    msg: "OS is not CentOS 8"
+  when: '"CentOS Linux 8" not in os_release.stdout'
+
+- set_fact:
+    os_name: 'centos'
+  when: '"CentOS Linux 8" in os_release.stdout'
+
+- name: Create download_cluster folder in /root
+  file:
+    path: "{{ download_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: install buildtools
+  package:
+    name: "{{ buildtools_packages }}"
+    state: present
+  register: buildtools_install_buildtools
+  until: buildtools_install_buildtools is succeeded
+  retries: 3
+
+- name: Disable Firewalld service
+  shell: systemctl disable firewalld
+  ignore_errors: yes
+
+- name: Stop Firewalld service systemctl stop firewalld
+  shell: systemctl stop firewalld
+  ignore_errors: yes
+
+# - name: Disable Firewalld service | yum remove firewalld
+#   shell: systemctl remove firewalld -y
+#   ignore_errors: yes
+
+- name: Disable SELinux at next reboot
+  selinux:
+    state: disabled
+
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: /usr/sbin/setenforce 0
+  ignore_errors: true
+
+- name: change hostname to the servers
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Install EPEL
+  yum:
+    name: epel-release
+    state: present
+
+- name: Enable PowerTools
+  shell: yum config-manager --set-enabled PowerTools
+
+- name: Config Manager
+  shell: yum install 'dnf-command(config-manager)' -y
+
+- name: Enable PowerTools
+  shell: yum config-manager --set-enabled PowerTools -y
+
+- name: Install Remi repository
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+    state: present
+
+- name: Ensure dnf-plugins are installed on CentOS 8+.
+  yum:
+    name: dnf-plugins-core
+    state: present

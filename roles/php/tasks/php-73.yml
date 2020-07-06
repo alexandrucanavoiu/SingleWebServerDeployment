@@ -1,0 +1,21 @@
+---
+- name: Install PHP 73
+  yum:
+    name: "{{ php73_version }}"
+    state: present
+  retries: 3
+
+- name: PHP-FPM 7.3 Copy php.ini file
+  template:
+    src: etc/opt/remi/php73/php73.ini.j2
+    dest: "/etc/opt/remi/php73/php.ini"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Recursively change ownership of a directory
+  file:
+    path: "/var/opt/remi/php73/lib/php/"
+    owner: root
+    group: "nginx"
+    recurse: yes

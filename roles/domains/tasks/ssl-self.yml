@@ -1,0 +1,24 @@
+---
+- name: create Self-Signed SSL key for domain {{ domain_name }} Step 1/4 | haproxy
+  openssl_privatekey:
+    path: "/etc/nginx/ssl/{{ domain_name }}.key"
+  register: key
+
+- name: create Self-Signed SSL csr for domain {{ domain_name }} Step 2/4 | haproxy
+  openssl_csr:
+    path: "/etc/nginx/ssl/{{ domain_name }}.csr"
+    privatekey_path: "{{ key.filename }}"
+    common_name: "{{ domain_name }}"
+  register: csr
+
+- name: create Self-Signed SSL for domain {{ domain_name }} Step 3/4 | haproxy
+  openssl_certificate:
+    path: "/etc/nginx/ssl/{{ domain_name }}.crt"
+    privatekey_path: "{{ csr.privatekey }}"
+    csr_path: "{{ csr.filename }}"
+    provider: selfsigned
+
+- name: Restart nginx service
+  systemd:
+    name: nginx
+    state: restarted

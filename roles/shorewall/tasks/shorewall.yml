@@ -1,0 +1,27 @@
+---
+- name: install shorewall | shorewall
+  yum: 
+    name: shorewall
+    state: present
+  tags: shorewall
+  register: result
+  until: result is succeeded
+
+- name: Copy shorewall files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+  with_items:
+    - 'etc/shorewall/rules'
+    - 'etc/shorewall/interfaces'
+    # - 'etc/shorewall/hosts'
+    # - 'etc/shorewall/params'
+    - 'etc/shorewall/policy'
+    - 'etc/shorewall/shorewall.conf'
+    - 'etc/shorewall/zones'
+
+- name: Enable shorewall
+  systemd:
+    name: shorewall
+    enabled: yes
+    state: restarted
