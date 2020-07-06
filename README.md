@@ -1,4 +1,4 @@
-# SingleWebServerDeployment - A easy way to create a web server using ansible
+# SingleWebServerDeployment - An easy way to create a web server using ansible
 
 
 It was tested with:
