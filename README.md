@@ -60,5 +60,5 @@ Remember to modify the variables with your data!!!
 #### 2. Start the SETUP
 
 ```
-$ ansible-playbook playbooks/setup-server-vars.yml
+$ ansible-playbook playbooks/setup-server.yml
 ```
