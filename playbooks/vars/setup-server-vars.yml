@@ -6,13 +6,13 @@ email_admin: "myemail@example.org"
 #shorewall
 shorewall_interfaces:
   - zone: net
-    ip: 192.168.1.100
-    interface: eth0
+    ip: 192.168.20.103
+    interface: ens18
     options: "dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0"
 
 shorewall_params:
   - zone: net
-    interface: eth0
+    interface: ens18
     options: "routefilter"
 
 # PHP
@@ -33,7 +33,7 @@ phpmyadmin_auth_password: "admin_93834874jdj"
 domain_name: example.org
 domain_username: example
 domain_php_version: php74
-domain_ip: 192.168.1.100
+domain_ip: 192.168.20.103
 # 1 = self / 2 = certbot
 domain_ssl: 1
 # 0 - ondemand / 1 - dynamic / 2 - static
