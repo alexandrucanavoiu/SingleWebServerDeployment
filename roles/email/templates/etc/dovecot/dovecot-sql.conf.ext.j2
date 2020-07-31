@@ -1,0 +1,4 @@
+driver = mysql
+connect = host=localhost dbname=postfix user=postfix password={{ postfix_password }}
+default_pass_scheme = SHA512-CRYPT
+password_query = SELECT email as user, password FROM virtual_users WHERE email='%u';

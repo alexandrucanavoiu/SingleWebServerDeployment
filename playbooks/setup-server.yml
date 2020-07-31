@@ -11,9 +11,12 @@
           - { role: logrotate, tags: logrotate }
           - { role: shorewall, tags: shorewall }
           - { role: nginx, tags: nginx }
+          - { role: ntp, tags: ntp }
           - { role: php, tags: php }
           - { role: composer-tool, tags: composer-tool }
           - { role: domains, tags: domains }
           - { role: certbot, tags: certbot, when: domain_ssl == 2 }
-          - { role: mysql8, tags: mysql8 }
+          # - { role: mysql8, tags: mysql8 }
+          - { role: mariadb, tags: mariadb }
           - { role: phpmyadmin, tags: phpmyadmin }
+          - { role: email, tags: email }

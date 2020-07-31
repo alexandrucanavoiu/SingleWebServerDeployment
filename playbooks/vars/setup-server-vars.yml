@@ -6,7 +6,7 @@ email_admin: "myemail@example.org"
 #shorewall
 shorewall_interfaces:
   - zone: net
-    ip: 192.168.20.103
+    ip: 192.168.20.213
     interface: ens18
     options: "dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0"
 
@@ -16,7 +16,7 @@ shorewall_params:
     options: "routefilter"
 
 # PHP
-install_php71: 1
+install_php71: 0
 install_php73: 0
 install_php74: 1
 default_php_version: php74
@@ -33,7 +33,10 @@ phpmyadmin_auth_password: "admin_93834874jdj"
 domain_name: example.org
 domain_username: example
 domain_php_version: php74
-domain_ip: 192.168.20.103
+domain_ip: 192.168.20.213
+domain_email: 'office@example.org'
+domain_email_alias: 'contact@example.org'
+domain_email_password: '12345678901'
 # 1 = self / 2 = certbot
 domain_ssl: 1
 # 0 - ondemand / 1 - dynamic / 2 - static

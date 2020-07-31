@@ -1,0 +1,20 @@
+---
+- name: restart postfix
+  service:
+    name: postfix
+    state: restarted
+
+- name: restart dovecot
+  service:
+    name: dovecot
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: restart php-fpm
+  service:
+    name: "{{ domain_php_version}}-php-fpm"
+    state: restarted

@@ -1,0 +1,79 @@
+---
+- name: Copy dovecot configs
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - 'etc/dovecot/dovecot-sql.conf.ext'
+    - 'etc/dovecot/dovecot.conf'
+    - 'etc/dovecot/conf.d/10-auth.conf'
+    - 'etc/dovecot/conf.d/10-director.conf'
+    - 'etc/dovecot/conf.d/10-logging.conf'
+    - 'etc/dovecot/conf.d/10-mail.conf'
+    - 'etc/dovecot/conf.d/10-master.conf'
+    - 'etc/dovecot/conf.d/10-ssl.conf'
+    - 'etc/dovecot/conf.d/15-lda.conf'
+    - 'etc/dovecot/conf.d/15-mailboxes.conf'
+    - 'etc/dovecot/conf.d/20-imap.conf'
+    - 'etc/dovecot/conf.d/20-lmtp.conf'
+    - 'etc/dovecot/conf.d/20-managesieve.conf'
+    - 'etc/dovecot/conf.d/20-pop3.conf'
+    - 'etc/dovecot/conf.d/20-submission.conf'
+    - 'etc/dovecot/conf.d/90-acl.conf'
+    - 'etc/dovecot/conf.d/90-plugin.conf'
+    - 'etc/dovecot/conf.d/90-quota.conf'
+    - 'etc/dovecot/conf.d/90-sieve.conf'
+    - 'etc/dovecot/conf.d/90-sieve-extprograms.conf'
+    - 'etc/dovecot/conf.d/auth-checkpassword.conf.ext'
+    - 'etc/dovecot/conf.d/auth-deny.conf.ext'
+    - 'etc/dovecot/conf.d/auth-dict.conf.ext'
+    - 'etc/dovecot/conf.d/auth-ldap.conf.ext'
+    - 'etc/dovecot/conf.d/auth-master.conf.ext'
+    - 'etc/dovecot/conf.d/auth-passwdfile.conf.ext'
+    - 'etc/dovecot/conf.d/auth-sql.conf.ext'
+    - 'etc/dovecot/conf.d/auth-static.conf.ext'
+    - 'etc/dovecot/conf.d/auth-system.conf.ext'
+    - 'etc/dovecot/conf.d/auth-vpopmail.conf.ext'
+
+- name: Add group mails
+  group:
+    name: mails
+    state: present
+
+- name: Add user mails
+  user:
+    name: mails
+    shell: /bin/nologin
+    home: /var/mails/
+    create_home: yes
+    group: mails
+    state: present
+
+- name: Change dovecot permission to 0750
+  file: 
+    path: /etc/dovecot
+    mode: '0750'
+  notify:
+    - restart dovecot
+
+- set_fact:
+    email_domain_email: "@{{ domain_name }}"
+
+- name: Create a directory if it does not exist
+  file:
+    path: '/var/mails/{{ domain_name }}/{{ domain_email|replace(email_domain_email, "") }}'
+    state: directory
+    mode: '0755'
+    owner: mails
+    group: mails
+
+- name: Change mails directory permission to 0755
+  file: 
+    path: /var/mails
+    mode: '0755'
+    owner: mails
+    group: mails
+    recurse: yes

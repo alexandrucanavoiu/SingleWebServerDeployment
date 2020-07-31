@@ -1,0 +1,4 @@
+---
+mariadb_logrotate:
+  configure: true
+  rotate: 3
