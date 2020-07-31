@@ -6,7 +6,7 @@ email_admin: "myemail@example.org"
 #shorewall
 shorewall_interfaces:
   - zone: net
-    ip: 192.168.20.213
+    ip: 192.168.1.101
     interface: ens18
     options: "dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0"
 
@@ -33,7 +33,7 @@ phpmyadmin_auth_password: "admin_93834874jdj"
 domain_name: example.org
 domain_username: example
 domain_php_version: php74
-domain_ip: 192.168.20.213
+domain_ip: 192.168.1.101
 domain_email: 'office@example.org'
 domain_email_alias: 'contact@example.org'
 domain_email_password: '12345678901'
