@@ -1,0 +1,86 @@
+---
+- name: Install MariaDB
+  dnf:
+    name: ['mariadb-server', 'mariadb', 'mysql-devel', 'python3-devel']
+    state: present
+
+- name: Create /var/lib/mysql directory if not exist
+  file:
+    path: /var/lib/mysql
+    state: directory
+    owner: mysql
+    group: mysql
+
+- name: Create log directory
+  file:
+    state: directory
+    path: /var/log/mysql
+    owner: mysql
+    group: mysql
+    mode: 0755
+  when: mariadb_logrotate.configure|bool
+
+- name: Configure logrotate
+  template:
+    src: log_rotate_mariadb.conf.j2
+    dest: /etc/logrotate.d/mariadb
+  when: mariadb_logrotate.configure|bool
+
+- name: Enable MariaDB service
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: Install mysqlclient using pip3
+  pip:
+      name: mysqlclient
+      executable: pip3
+
+- name: MariaDB mysql_secure_installation
+  expect:
+    command: mysql_secure_installation
+    responses:
+      Enter current password for root:
+        - "none"
+      Switch to unix_socket authentication:
+        - "Y"
+      Change the root password?:
+        - "Y"
+      New password:
+        - "{{ mysql8_root_password }}"
+      Re-enter new password:
+        - "{{ mysql8_root_password }}"
+      Remove anonymous users?:
+        - "Y"
+      Disallow root login remotely?:
+        - "Y"
+      Remove test database and access to it?:
+        - "Y"
+      Reload privilege tables now?:
+        - "Y"
+
+- name: Copy my.cnf
+  template:
+    src: "my.cnf.j2"
+    dest: "/etc/my.cnf"
+    owner: root
+    group: root
+    mode: '0600'
+  notify:
+    - restart mariadb
+
+- name: Create a new database with name {{ mysql_database_name }}
+  mysql_db:
+    name: "{{ mysql_database_name }}"
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+
+- name: Create a new username {{ mysql_username }} and grant access to {{ mysql_database_name }}
+  mysql_user:
+    name: "{{ mysql_username }}"
+    password: "{{ mysql_username_password }}"
+    priv: "{{ mysql_database_name }}.*:ALL"
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+    host: "%"

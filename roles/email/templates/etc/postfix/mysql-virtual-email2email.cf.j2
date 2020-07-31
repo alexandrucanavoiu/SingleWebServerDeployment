@@ -1,0 +1,5 @@
+user = postfix
+password = {{ postfix_password }}
+hosts = localhost
+dbname = postfix
+query = SELECT email FROM virtual_users WHERE email='%s'

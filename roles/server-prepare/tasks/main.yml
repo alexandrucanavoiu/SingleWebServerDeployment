@@ -71,7 +71,22 @@
     name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
     state: present
 
-- name: Ensure dnf-plugins are installed on CentOS 8+.
+- name: Ensure dnf-plugins is installed on CentOS 8+.
   yum:
     name: dnf-plugins-core
     state: present
+
+- name: Ensure python3 is installed on CentOS 8+.
+  yum:
+    name: python3
+    state: present
+
+- name: Install pymysql using pip3
+  pip:
+      name: pymysql
+      executable: pip3
+
+- name: Install pexpect using pip3
+  pip:
+      name: pexpect
+      executable: pip3

@@ -1,0 +1,48 @@
+---
+# - name: Remove sendmail if exist
+#   dnf:
+#     name: sendmail
+#     state: absent
+
+# - name: Copy Postfix3 Repo file
+#   copy:
+#     src: gf.repo
+#     dest: /etc/yum.repos.d/gf.repo
+#     owner: root
+#     group: root
+
+# - name: Download RPM-GPG-KEY-gf.el8
+#   get_url:
+#     url: http://mirror.ghettoforge.org/distributions/gf/RPM-GPG-KEY-gf.el8
+#     dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-gf.el8
+
+- name: Install Packages for Postfix3/Dovecot
+  dnf:
+    name: ['libicu-devel', 'libicu65', 'postfix', 'postfix-mysql', 'dovecot','dovecot-pigeonhole','dovecot-mysql', 'expect']
+    state: present
+
+- name: Drop database with name postfix
+  mysql_db:
+    name: postfix
+    state: absent
+    login_password: "{{ mysql8_root_password }}"
+
+- name: Delete username postfix
+  mysql_user:
+    name: postfix
+    state: absent
+    login_password: "{{ mysql8_root_password }}"
+    host: "localhost"
+
+- name: Drop database with name postfix
+  mysql_db:
+    name: roundcube
+    state: absent
+    login_password: "{{ mysql8_root_password }}"
+
+- name: Delete username roundcube
+  mysql_user:
+    name: roundcube
+    state: absent
+    login_password: "{{ mysql8_root_password }}"
+    host: "localhost"

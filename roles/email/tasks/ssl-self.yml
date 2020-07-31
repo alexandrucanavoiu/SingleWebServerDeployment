@@ -1,0 +1,43 @@
+---
+- name: create Self-Signed SSL key for domain webmail.{{ domain_name }} Step 1/4
+  openssl_privatekey:
+    path: "/etc/nginx/ssl/webmail.{{ domain_name }}.key"
+  register: key
+
+- name: create Self-Signed SSL csr for domain webmail.{{ domain_name }} Step 2/4
+  openssl_csr:
+    path: "/etc/nginx/ssl/webmail.{{ domain_name }}.csr"
+    privatekey_path: "{{ key.filename }}"
+    common_name: "webmail.{{ domain_name }}"
+  register: csr
+
+- name: create Self-Signed SSL for domain webmail.{{ domain_name }} Step 3/4
+  openssl_certificate:
+    path: "/etc/nginx/ssl/webmail.{{ domain_name }}.crt"
+    privatekey_path: "{{ csr.privatekey }}"
+    csr_path: "{{ csr.filename }}"
+    provider: selfsigned
+
+- name: create Self-Signed SSL key for domain mail.{{ domain_name }} Step 1/4
+  openssl_privatekey:
+    path: "/etc/nginx/ssl/mail.{{ domain_name }}.key"
+  register: key
+
+- name: create Self-Signed SSL csr for domain mail.{{ domain_name }} Step 2/4
+  openssl_csr:
+    path: "/etc/nginx/ssl/mail.{{ domain_name }}.csr"
+    privatekey_path: "{{ key.filename }}"
+    common_name: "mail.{{ domain_name }}"
+  register: csr
+
+- name: create Self-Signed SSL for domain mail.{{ domain_name }} Step 3/4
+  openssl_certificate:
+    path: "/etc/nginx/ssl/mail.{{ domain_name }}.crt"
+    privatekey_path: "{{ csr.privatekey }}"
+    csr_path: "{{ csr.filename }}"
+    provider: selfsigned
+
+- name: Restart nginx service
+  systemd:
+    name: nginx
+    state: restarted

@@ -1,0 +1,70 @@
+---
+
+- set_fact:
+    postfix_password: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters,digits,hexdigits') }}"
+
+# - debug:
+#     msg: "Postfix user password {{ postfix_password }}"
+
+- name: Create a new database with name postfix
+  mysql_db:
+    name: postfix
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+
+- name: Create a new username postfix and grant access to postfix database
+  mysql_user:
+    name: postfix
+    password: "{{ postfix_password }}"
+    priv: "postfix.*:ALL"
+    state: present
+    login_password: "{{ mysql8_root_password }}"
+    host: "localhost"
+
+- name: Copy database postfix.sql file
+  copy:
+    src: postfix.sql
+    dest: "{{ download_path }}"
+
+- name: Restore database postfix
+  mysql_db:
+    name: postfix
+    login_user: postfix
+    login_password: "{{ postfix_password }}"
+    state: import
+    target: "{{ download_path }}/postfix.sql"
+
+- name: Copy postfix configs
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - 'etc/postfix/main.cf'
+    - 'etc/postfix/master.cf'
+    - 'etc/postfix/mysql-virtual-alias-maps.cf'
+    - 'etc/postfix/mysql-virtual-email2email.cf'
+    - 'etc/postfix/mysql-virtual-mailbox-domains.cf'
+    - 'etc/postfix/mysql-virtual-mailbox-maps.cf'
+  notify:
+    - restart postfix
+
+- name: Copy insert_postfix.sh
+  template:
+    src: "insert_postfix.sh.j2"
+    dest: "{{ download_path }}/insert_postfix.sh"
+    owner: root
+    group: root
+    mode: '777'
+
+- debug:
+    msg: "domain_email_password {{ domain_email_password }}"
+
+- name: Execute insert_postfix.sh script
+  expect:
+    command: "{{ download_path }}/insert_postfix.sh"
+    responses:
+      Enter password:
+        - "{{ postfix_password }}"

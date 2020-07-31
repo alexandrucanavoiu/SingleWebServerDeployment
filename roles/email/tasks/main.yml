@@ -1,0 +1,11 @@
+---
+- import_tasks: prepare.yml
+
+- import_tasks: ssl-self.yml
+  when: domain_ssl == 1
+
+- import_tasks: postfix.yml
+
+- import_tasks: dovecot.yml
+
+- import_tasks: roundcube.yml

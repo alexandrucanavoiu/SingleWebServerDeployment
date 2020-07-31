@@ -34,14 +34,20 @@ ACCEPT          {{ i.zone }}      $FW               tcp   22
 ACCEPT          $FW              {{ i.zone }}        tcp   22
 {% endfor %}
 
-#open HTTP port from internet to firewall for all IP
+#open HTTP(s) port from internet to firewall for all IP
 {% for i in shorewall_interfaces %}
 HTTP/ACCEPT     {{ i.zone }}                       $FW 
 HTTPS/ACCEPT     {{ i.zone }}                   $FW 
 {% endfor %}
 
-#open HTTP port from firewall to internet for all IP
+#open HTTP(s) port from firewall to internet for all IP
 {% for i in shorewall_interfaces %}
 HTTP/ACCEPT     $FW                     {{ i.zone }}
 HTTPS/ACCEPT     $FW                    {{ i.zone }}
+{% endfor %}
+
+#open EMAIL ports
+{% for i in shorewall_interfaces %}
+ACCEPT          {{ i.zone }}      $FW               tcp   993,995,587,110,143,465,25
+ACCEPT          $FW              {{ i.zone }}        tcp   993,995,587,110,143,465,25
 {% endfor %}

@@ -1,0 +1,14 @@
+---
+- name: install chrony/ntp
+  dnf:
+    name: chrony
+    state: present
+  register: chrony
+  until: chrony is succeeded
+  retries: 3
+
+- name: Enable chrony service
+  systemd:
+    name: chronyd
+    state: restarted
+    enabled: yes

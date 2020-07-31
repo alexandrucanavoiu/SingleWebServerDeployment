@@ -1,0 +1,31 @@
+---
+- name: Stop Mysql/MariaDB if exist
+  systemd:
+    name: "{{ item }}"
+    state: "stopped"
+  ignore_errors: true
+  with_items:
+      - mysqld
+      - mariadb
+
+- name: Remove all Mysql/MariaDB packages
+  dnf:
+    name: ['mysql', 'mariadb-server']
+    state: absent
+
+- name: Remove Mysql/MariaDB old data if exist
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /var/lib/mysql
+    - /var/log/mysql/mysqld.log
+    - /var/log/mysqld.log
+  ignore_errors: yes
+
+- name: Copy MariaDB Repo file
+  copy:
+    src: MariaDB.repo
+    dest: /etc/yum.repos.d/mariadb.repo
+    owner: root
+    group: root

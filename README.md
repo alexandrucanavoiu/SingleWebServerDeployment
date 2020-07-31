@@ -7,7 +7,7 @@ It was tested with:
 
 ## Overview
 - Nginx
-- Mysql8
+- MariaDB
 - PHP74, PHP73, PHP71
 - Logrotate
 - Domain
@@ -16,6 +16,10 @@ It was tested with:
 - Rsyslog
 - Phpmyadmin
 - Composer tool
+- Postfix
+- Dovecot
+- Roundcube
+- Ntp/Chrony
 
 ## How to setup
 

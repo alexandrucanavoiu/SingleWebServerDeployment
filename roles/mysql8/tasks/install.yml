@@ -38,11 +38,6 @@
   notify:
     - restart mysql8
 
-- name: Make sure pymysql is present
-  pip:
-    name: pymysql
-    state: present
-
 - name: Create a new database with name {{ mysql_database_name }}
   mysql_db:
     name: "{{ mysql_database_name }}"
