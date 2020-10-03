@@ -1,12 +1,12 @@
 ---
-hostname: "vps.example.org"
+hostname: "demo.example.org"
 download_path: "/root/downloads"
-email_admin: "myemail@example.org"
+email_admin: "alex.canavoiu@demo.example.org
 
 #shorewall
 shorewall_interfaces:
   - zone: net
-    ip: 192.168.1.101
+    ip: 192.168.20.124
     interface: ens18
     options: "dhcp,tcpflags,logmartians,nosmurfs,sourceroute=0"
 
@@ -26,24 +26,24 @@ nginx_version: 1.18.0
 
 # Phpmyadmin
 phpmyadmin_version: 5.0.2
-phpmyadmin_auth_user: "admin"
-phpmyadmin_auth_password: "admin_93834874jdj"
+phpmyadmin_auth_user: "alexandru"
+phpmyadmin_auth_password: "saasksdklaslklsa"
 
 #### Domain
-domain_name: example.org
+domain_name: demo.example.org"
 domain_username: example
 domain_php_version: php74
-domain_ip: 192.168.1.101
-domain_email: 'office@example.org'
-domain_email_alias: 'contact@example.org'
-domain_email_password: '12345678901'
+domain_ip: 192.168.20.124
+domain_email: 'office@demo.example.org"'
+domain_email_alias: 'contact@demo.example.org"'
+domain_email_password: 'fdffdfdfdfdfd'
 # 1 = self / 2 = certbot
 domain_ssl: 1
 # 0 - ondemand / 1 - dynamic / 2 - static
 php_fpm_pm_type: 0
 
 #mysql8
-mysql8_root_password: ds9A3kfdkFfd@jf@djdfjdfj
-mysql_username: testing_user
-mysql_username_password: 93494kfkfk@SKKlsl02!@_
-mysql_database_name: testing_db
+mysql8_root_password: jruLdsfdfdfd4@fddf44bffgfgfg
+mysql_username: demo1123
+mysql_username_password: demo1123
+mysql_database_name: demo1123
